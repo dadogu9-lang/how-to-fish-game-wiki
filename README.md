@@ -11,6 +11,18 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+## Deployment environment variables
+
+Set these variables in the deployment platform before publishing:
+
+```env
+NEXT_PUBLIC_SITE_URL=https://www.howtofishgame.best
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+```
+
+`NEXT_PUBLIC_GA_ID` is optional for local development. When it is present,
+the root layout loads Google Analytics 4 after the page becomes interactive.
+
 ## Production check
 
 ```bash
