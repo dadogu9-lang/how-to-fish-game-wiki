@@ -1,0 +1,103 @@
+import assert from "node:assert/strict";
+import { after, before, test } from "node:test";
+import { spawn } from "node:child_process";
+
+const port = 3107;
+const baseUrl = `http://127.0.0.1:${port}`;
+let server;
+
+async function waitForServer() {
+  const deadline = Date.now() + 30_000;
+  while (Date.now() < deadline) {
+    try {
+      const response = await fetch(baseUrl);
+      if (response.ok) return;
+    } catch {}
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  }
+  throw new Error("Next.js test server did not become ready");
+}
+
+async function get(path) {
+  const response = await fetch(`${baseUrl}${path}`);
+  const body = await response.text();
+  assert.equal(response.status, 200, `${path} should return HTTP 200`);
+  return body;
+}
+
+before(async () => {
+  server = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "-p", String(port)], {
+    cwd: process.cwd(),
+    stdio: "ignore",
+  });
+  await waitForServer();
+});
+
+after(() => {
+  server?.kill();
+});
+
+test("homepage explains the game loop and exposes four current answers", async () => {
+  const html = await get("/");
+  assert.match(html, /How to Fish Game Wiki/);
+  assert.match(html, /Catch, fight, sell, progress/i);
+  assert.match(html, /Trending now/i);
+  for (const href of [
+    "/guides/endangered-fish",
+    "/quests/leeches",
+    "/game-info/sales-player-count",
+    "/game-info/updates-roadmap",
+  ]) {
+    assert.match(html, new RegExp(`href="${href}"`));
+  }
+});
+
+test("guides hub leads with the highest-impression player questions", async () => {
+  const html = await get("/guides");
+  assert.match(html, /How to Fish Game Guides/);
+  assert.match(html, /Endangered Fish/);
+  assert.match(html, /Beginner Guide/);
+  assert.doesNotMatch(html, /published drafts/i);
+});
+
+test("endangered-fish guide gives the direct quest flow without editorial scaffolding", async () => {
+  const html = await get("/guides/endangered-fish");
+  assert.match(html, /Standard Lure/);
+  assert.match(html, /Endangered Species/);
+  assert.match(html, /Carrot/);
+  assert.match(html, /Pufferfish/);
+  assert.doesNotMatch(html, /research draft|planned page|recommended page outline/i);
+});
+
+test("leeches guide resolves the count and explains the boss-bait handoff", async () => {
+  const html = await get("/quests/leeches");
+  assert.match(html, /three Leeches/i);
+  assert.match(html, /Forest Island/);
+  assert.match(html, /Modified Leech/);
+  assert.match(html, /Giant Piranha/);
+  assert.doesNotMatch(html, /research draft|before launch|should show/i);
+});
+
+test("game-info pages distinguish sourced facts from estimates and roadmap uncertainty", async () => {
+  const sales = await get("/game-info/sales-player-count");
+  assert.match(sales, /one million copies/i);
+  assert.match(sales, /estimate, not official revenue/i);
+  assert.match(sales, /373,971/);
+
+  const updates = await get("/game-info/updates-roadmap");
+  assert.match(updates, /no detailed public roadmap/i);
+  assert.match(updates, /official Steam announcements/i);
+  assert.match(updates, /Patch 1\.0\.9/);
+});
+
+test("internal search and empty hubs are kept out of index signals", async () => {
+  const search = await get("/search");
+  assert.match(search, /<meta name="robots" content="noindex, follow"/);
+
+  const sitemap = await get("/sitemap.xml");
+  assert.doesNotMatch(sitemap, /<loc>[^<]*\/search<\/loc>/);
+  assert.doesNotMatch(sitemap, /<loc>[^<]*\/items<\/loc>/);
+  assert.doesNotMatch(sitemap, /<loc>[^<]*\/faq<\/loc>/);
+  assert.match(sitemap, /<loc>[^<]*\/game-info\/sales-player-count<\/loc>/);
+  assert.match(sitemap, /<loc>[^<]*\/game-info\/updates-roadmap<\/loc>/);
+});

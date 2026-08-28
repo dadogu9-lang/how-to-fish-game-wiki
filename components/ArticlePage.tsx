@@ -16,7 +16,6 @@ export default function ArticlePage({ article }: { article: Article }) {
             <div>
               <div className="eyebrow-row">
                 <span className="eyebrow">{category?.eyebrow}</span>
-                <span className="status-pill">{article.status}</span>
               </div>
               <h1>{article.title}</h1>
               <p className="article-lead">{article.excerpt}</p>
@@ -50,7 +49,7 @@ export default function ArticlePage({ article }: { article: Article }) {
           <section className="source-notes" id="sources">
             <div className="section-heading-line"><span className="eyebrow">Evidence trail</span><span className="line" /></div>
             <h2>Sources and update notes</h2>
-            <p>This is a research draft. Use the links below as a starting point, then verify volatile details in the current game build before publishing.</p>
+            <p>Game details can change after patches. These sources were checked for the date shown above; use current in-game labels and official announcements when they differ.</p>
             <ol>
               {article.sources.map((source) => <li key={source.url}><a href={source.url} target="_blank" rel="noreferrer">{source.label} ↗</a><span>{source.note}</span></li>)}
             </ol>
@@ -66,9 +65,9 @@ export default function ArticlePage({ article }: { article: Article }) {
             </nav>
           </div>
           <div className="sidebar-card fact-card">
-            <span className="mini-label">Editorial rule</span>
-            <strong>Lead with the answer. Show the evidence below it.</strong>
-            <p>That keeps the page useful for players while preserving a trail for future corrections.</p>
+            <span className="mini-label">Quick rule</span>
+            <strong>Use the direct answer first, then check the dated sources.</strong>
+            <p>Patch-sensitive facts are easier to verify when the route and evidence stay together.</p>
           </div>
         </aside>
       </section>

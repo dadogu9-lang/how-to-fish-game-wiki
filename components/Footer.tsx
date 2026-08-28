@@ -6,11 +6,12 @@ export default function Footer() {
       <div className="container footer-grid">
         <div>
           <div className="footer-brand">HOW TO FISH <span>GAME WIKI</span></div>
-          <p>A research-first guide site for quests, bosses, islands, weapons, fish, and achievements.</p>
+          <p>Direct answers for How to Fish quests, bosses, islands, equipment, game updates, and player questions.</p>
         </div>
         <div className="footer-links">
           <span>Explore</span>
           <Link href="/guides">Guides</Link>
+          <Link href="/game-info">Game info</Link>
           <Link href="/bosses">Bosses</Link>
           <Link href="/fish">Fish database</Link>
         </div>
@@ -22,7 +23,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="container footer-bottom">
-        <span>Research draft · verify changing facts before publishing</span>
+        <span>Independent fan guide · patch-sensitive facts include dated sources</span>
         <span>© 2026 How to Fish Game Wiki</span>
       </div>
     </footer>

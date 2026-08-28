@@ -13,11 +13,11 @@ export const metadata: Metadata = {
     default: "How to Fish Game Wiki | Guides, Bosses & Achievements",
     template: "%s | How to Fish Game Wiki",
   },
-  description: "A research-first How to Fish Game wiki for quests, bosses, island progression, weapons, fish, and achievements.",
+  description: "A current How to Fish Game wiki for quest answers, boss strategies, island progression, weapons, player counts, and updates.",
   alternates: { canonical: "/" },
   openGraph: {
     title: "How to Fish Game Wiki",
-    description: "Guides, boss strategies, quests, progression, and achievement checklists for How to Fish.",
+    description: "Quest answers, boss strategies, island routes, equipment, player counts, and current updates for How to Fish.",
     url: siteUrl,
     siteName: "How to Fish Game Wiki",
     type: "website",

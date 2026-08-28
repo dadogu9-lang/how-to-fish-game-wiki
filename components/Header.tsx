@@ -3,6 +3,7 @@ import Link from "next/link";
 const navItems = [
   { href: "/", label: "Wiki" },
   { href: "/guides", label: "Guides" },
+  { href: "/game-info", label: "Game Info" },
   { href: "/quests", label: "Quests" },
   { href: "/bosses", label: "Bosses" },
   { href: "/achievements", label: "Achievements" },
