@@ -151,3 +151,29 @@ test("guide pages publish Article and three-level breadcrumbs without rich-resul
   );
   assert.doesNotMatch(JSON.stringify(schemas), /SearchAction|HowTo|FAQPage/);
 });
+
+test("the production ad preview is noindex and does not server-render a third-party ad script", async () => {
+  const preview = await get("/ad-preview");
+
+  assert.match(preview, /<meta name="robots" content="noindex, nofollow"/);
+  assert.match(preview, /data-ad-slot="responsive-article"/);
+  assert.doesNotMatch(
+    preview,
+    /<script[^>]+src="https:\/\/(?:www\.)?(?:highrevenueformat|profitableratecpmnetwork)\.com/i,
+  );
+
+  const sitemap = await get("/sitemap.xml");
+  assert.doesNotMatch(sitemap, /<loc>[^<]*\/ad-preview<\/loc>/);
+});
+
+test("visitors can reach privacy information and reopen optional cookie settings", async () => {
+  const home = await get("/");
+  assert.match(home, /href="\/privacy"/);
+  assert.match(home, /Cookie settings/i);
+
+  const privacy = await get("/privacy");
+  assert.match(privacy, /<meta name="robots" content="noindex, follow"/);
+  assert.match(privacy, /Google Analytics/i);
+  assert.match(privacy, /Adsterra/i);
+  assert.match(privacy, /Reject optional/i);
+});

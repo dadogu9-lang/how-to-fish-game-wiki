@@ -1,4 +1,5 @@
 import Link from "next/link";
+import CookieSettingsButton from "@/components/CookieSettingsButton";
 
 export default function Footer() {
   return (
@@ -19,6 +20,8 @@ export default function Footer() {
           <span>Project</span>
           <Link href="/search">Search</Link>
           <Link href="/achievements">Achievements</Link>
+          <Link href="/privacy">Privacy</Link>
+          <CookieSettingsButton />
           <a href="https://store.steampowered.com/app/4001890/How_to_Fish/" target="_blank" rel="noreferrer">Steam page ↗</a>
         </div>
       </div>
