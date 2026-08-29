@@ -25,6 +25,11 @@ async function get(path) {
   return body;
 }
 
+function getJsonLd(html) {
+  return [...html.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)]
+    .map((match) => JSON.parse(match[1]));
+}
+
 before(async () => {
   server = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "-p", String(port)], {
     cwd: process.cwd(),
@@ -100,4 +105,49 @@ test("internal search and empty hubs are kept out of index signals", async () =>
   assert.doesNotMatch(sitemap, /<loc>[^<]*\/faq<\/loc>/);
   assert.match(sitemap, /<loc>[^<]*\/game-info\/sales-player-count<\/loc>/);
   assert.match(sitemap, /<loc>[^<]*\/game-info\/updates-roadmap<\/loc>/);
+});
+
+test("homepage publishes one minimal WebSite entity without deprecated search markup", async () => {
+  const schemas = getJsonLd(await get("/"));
+  const website = schemas.find((schema) => schema["@type"] === "WebSite");
+
+  assert.ok(website, "homepage should publish WebSite JSON-LD");
+  assert.equal(website.name, "How to Fish Game Wiki");
+  assert.equal(new URL(website.url).pathname, "/");
+  assert.doesNotMatch(JSON.stringify(schemas), /SearchAction|HowTo|FAQPage/);
+});
+
+test("category pages publish a two-level BreadcrumbList", async () => {
+  const schemas = getJsonLd(await get("/guides"));
+  const breadcrumbs = schemas.find((schema) => schema["@type"] === "BreadcrumbList");
+
+  assert.ok(breadcrumbs, "category should publish BreadcrumbList JSON-LD");
+  assert.deepEqual(
+    breadcrumbs.itemListElement.map(({ position, name }) => ({ position, name })),
+    [
+      { position: 1, name: "Wiki" },
+      { position: 2, name: "Guides" },
+    ],
+  );
+});
+
+test("guide pages publish Article and three-level breadcrumbs without rich-result overreach", async () => {
+  const schemas = getJsonLd(await get("/guides/endangered-fish"));
+  const article = schemas.find((schema) => schema["@type"] === "Article");
+  const breadcrumbs = schemas.find((schema) => schema["@type"] === "BreadcrumbList");
+
+  assert.ok(article, "guide should publish Article JSON-LD");
+  assert.equal(article.headline, "How to Get an Endangered Fish in How to Fish");
+  assert.equal(article.about["@type"], "VideoGame");
+  assert.equal(article.about.name, "How to Fish");
+  assert.match(article.author.description, /independent fan guide/i);
+  assert.deepEqual(
+    breadcrumbs.itemListElement.map(({ position, name }) => ({ position, name })),
+    [
+      { position: 1, name: "Wiki" },
+      { position: 2, name: "Guides" },
+      { position: 3, name: "How to Get an Endangered Fish in How to Fish" },
+    ],
+  );
+  assert.doesNotMatch(JSON.stringify(schemas), /SearchAction|HowTo|FAQPage/);
 });

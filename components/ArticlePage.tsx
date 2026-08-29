@@ -2,13 +2,24 @@ import Link from "next/link";
 import type { Article } from "@/lib/content";
 import { getCategory, getRelatedArticles } from "@/lib/content";
 import ArticleCard from "@/components/ArticleCard";
+import JsonLd from "@/components/JsonLd";
+import { getArticleJsonLd, getBreadcrumbJsonLd } from "@/lib/structured-data";
 
 export default function ArticlePage({ article }: { article: Article }) {
   const category = getCategory(article.category);
   const related = getRelatedArticles(article);
+  const categoryLabel = category?.label ?? article.category;
 
   return (
     <main>
+      <JsonLd
+        data={getBreadcrumbJsonLd([
+          { name: "Wiki", path: "/" },
+          { name: categoryLabel, path: `/${article.category}` },
+          { name: article.title, path: `/${article.category}/${article.slug}` },
+        ])}
+      />
+      <JsonLd data={getArticleJsonLd(article, categoryLabel)} />
       <section className="article-hero">
         <div className="container narrow-container">
           <div className="breadcrumbs"><Link href="/">Wiki</Link><span>/</span><Link href={`/${article.category}`}>{category?.label}</Link><span>/</span><span>{article.title}</span></div>

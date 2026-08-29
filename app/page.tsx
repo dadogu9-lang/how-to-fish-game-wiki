@@ -1,7 +1,9 @@
 import Link from "next/link";
 import CategoryCard from "@/components/CategoryCard";
 import ArticleCard from "@/components/ArticleCard";
+import JsonLd from "@/components/JsonLd";
 import { categories, getArticleBySlug, getArticlesByCategory, getFeaturedArticles } from "@/lib/content";
+import { getWebsiteJsonLd } from "@/lib/structured-data";
 
 export default function HomePage() {
   const featured = getFeaturedArticles();
@@ -11,6 +13,7 @@ export default function HomePage() {
 
   return (
     <main>
+      <JsonLd data={getWebsiteJsonLd()} />
       <section className="home-hero">
         <div className="container hero-grid">
           <div className="hero-copy">

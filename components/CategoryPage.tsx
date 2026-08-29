@@ -2,6 +2,8 @@ import Link from "next/link";
 import type { CategorySlug } from "@/lib/content";
 import { getArticlesByCategory, getCategory } from "@/lib/content";
 import ArticleCard from "@/components/ArticleCard";
+import JsonLd from "@/components/JsonLd";
+import { getBreadcrumbJsonLd } from "@/lib/structured-data";
 
 export default function CategoryPage({ slug }: { slug: CategorySlug }) {
   const category = getCategory(slug);
@@ -11,6 +13,12 @@ export default function CategoryPage({ slug }: { slug: CategorySlug }) {
 
   return (
     <main>
+      <JsonLd
+        data={getBreadcrumbJsonLd([
+          { name: "Wiki", path: "/" },
+          { name: category.label, path: `/${category.slug}` },
+        ])}
+      />
       <section className="page-hero">
         <div className="container narrow-container">
           <div className="breadcrumbs"><Link href="/">Wiki</Link><span>/</span><span>{category.label}</span></div>
