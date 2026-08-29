@@ -3,16 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { OPTIONAL_CONSENT_EVENT, OPTIONAL_CONSENT_KEY, type OptionalConsent } from "@/lib/consent";
 
-const MOBILE_UNIT = { key: "5ae94ad8bad3095a03071c50c6354702", width: 320, height: 50 };
-const DESKTOP_UNIT = { key: "fc8b575640f04a1c770e6303783094e3", width: 300, height: 250 };
+const MOBILE_UNIT = { frame: "/ad-frame-mobile.html", width: 320, height: 50 };
+const DESKTOP_UNIT = { frame: "/ad-frame-desktop.html", width: 300, height: 250 };
 
 function getUnit(isMobile: boolean) {
   return isMobile ? MOBILE_UNIT : DESKTOP_UNIT;
-}
-
-function makeAdDocument(unit: typeof MOBILE_UNIT) {
-  const options = JSON.stringify({ key: unit.key, format: "iframe", height: unit.height, width: unit.width, params: {} });
-  return `<!doctype html><html><head><meta name="referrer" content="strict-origin-when-cross-origin"><style>html,body{margin:0;background:transparent;overflow:hidden}</style></head><body><script>window.atOptions=${options};</script><script src="https://www.highrevenueformat.com/${unit.key}/invoke.js"></script></body></html>`;
 }
 
 export default function AdSlot() {
@@ -62,14 +57,14 @@ export default function AdSlot() {
       <span className="ad-label">Advertisement</span>
       {canLoad ? (
         <iframe
-          key={unit.key}
+          key={unit.frame}
           title="Advertisement"
           width={unit.width}
           height={unit.height}
           loading="lazy"
           sandbox="allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
           referrerPolicy="strict-origin-when-cross-origin"
-          srcDoc={makeAdDocument(unit)}
+          src={unit.frame}
         />
       ) : (
         <div className="ad-placeholder" aria-hidden="true" />

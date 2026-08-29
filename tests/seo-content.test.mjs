@@ -177,3 +177,18 @@ test("visitors can reach privacy information and reopen optional cookie settings
   assert.match(privacy, /Adsterra/i);
   assert.match(privacy, /Reject optional/i);
 });
+
+test("ad frames use real noindex documents with the publisher-provided banner code", async () => {
+  const desktop = await get("/ad-frame-desktop.html");
+  const mobile = await get("/ad-frame-mobile.html");
+
+  assert.match(desktop, /<meta name="robots" content="noindex, nofollow">/i);
+  assert.match(desktop, /fc8b575640f04a1c770e6303783094e3\/invoke\.js/i);
+  assert.match(desktop, /'width'\s*:\s*300/i);
+  assert.match(desktop, /'height'\s*:\s*250/i);
+
+  assert.match(mobile, /<meta name="robots" content="noindex, nofollow">/i);
+  assert.match(mobile, /5ae94ad8bad3095a03071c50c6354702\/invoke\.js/i);
+  assert.match(mobile, /'width'\s*:\s*320/i);
+  assert.match(mobile, /'height'\s*:\s*50/i);
+});
